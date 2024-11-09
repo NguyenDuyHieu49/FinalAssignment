@@ -34,4 +34,4 @@ niên dưới 18 tuổi trong khu vực. Các thông tin một bản ghi bao g�
 
 ## Cài đặt
 - Tải phiên bản Release
-- Chạy file `QuanLyThanhThieuNien.exe'.
+- Chạy file `content-Release.jar'.
