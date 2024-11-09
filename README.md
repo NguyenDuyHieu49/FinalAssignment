@@ -17,7 +17,7 @@ niên dưới 18 tuổi trong khu vực. Các thông tin một bản ghi bao g�
 - Giới tính
 - Địa chỉ nơi ở
 - Hộ khẩu thường trú
-- Thông tin về người giám hộ (Bao gồm tên, giới tính, ngày sinh)
+- Thông tin về người giám hộ (Bao gồm tên, giới tính, ngày sinh, ...)
 - Quan hệ với người giám hộ
 - Tình trạng gia đình
 
