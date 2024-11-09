@@ -35,3 +35,4 @@ niên dưới 18 tuổi trong khu vực. Các thông tin một bản ghi bao g�
 ## Cài đặt
 - Tải phiên bản Release
 - Chạy file `content-Release.jar'.
+- Note: Do nhiều xung đột, yêu cần cần Netbeans/Intellij để open project và chạy class Start.java ở trong src/main/com/company/content để chạy chương trình
