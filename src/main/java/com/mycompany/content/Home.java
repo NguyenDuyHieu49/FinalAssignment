@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -165,6 +168,25 @@ public class Home {
   public int oneFive = 0;
   public int fiveTen = 0;
   public int under18 = 0;
+  int[] ageCount = new int[100];
+  
+  public void reloadChart(){
+      int i = 0;
+    for (var x : teenagersList) {
+        i++;
+        ageCount[x.getAge()]++;
+        if (x.getAge() <= 5) {
+          oneFive++;
+        } else {
+          if (x.getAge() <= 10) {
+            fiveTen++;
+          } else {
+            under18++;
+          }
+        }
+        System.out.println(i);
+    }
+  }
 
   public void updateScene(AnchorPane show, AnchorPane hide, AnchorPane hide2, AnchorPane hide3) {
     show.setVisible(true);
@@ -189,7 +211,7 @@ public class Home {
   Alert checkAlert = new Alert(AlertType.ERROR);
 
   public void save() {
-     db.deleteTeen(currentTeenager.getCCCD());
+    db.deleteTeen(currentTeenager.getCCCD());
     currentTeenager.setName(nameField.getText());
     currentTeenager.setGender(genderField.getValue());
     currentTeenager.setBirthday(birthdayField.getValue().toString());
@@ -202,7 +224,7 @@ public class Home {
     currentTeenager.setRelation(prRelationField.getText());
     currentTeenager.getPr().setAddress1(prHomeField.getText());
     currentTeenager.getPr().setAddress2(prLivingField.getText());
-    //TODO: Save data to JSON - checked
+    currentTeenager.getPr().setFamilyState(prFamilyStateField.getText());
     db.addTeenager(currentTeenager);
     change = false;
   }
@@ -262,7 +284,6 @@ public class Home {
     deleteAlert.showAndWait().ifPresent(r -> {
       if (r == deleteButton) {
         teenagersList.remove(currentTeenager);
-        //TODO Delete data from JSON - checked
         db.deleteTeen(currentTeenager.getCCCD());
         confirmDelete.showAndWait();
         back();
@@ -357,6 +378,8 @@ public class Home {
   public ObservableList<teenager> teenagersList;
 
   public void initialize() {
+    for(int i=0;i<100;++i) ageCount[i] = 0;
+    
     DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH : mm : ss");
     Timeline timeline = new Timeline(
       new KeyFrame(Duration.seconds(1), event -> {
@@ -528,19 +551,19 @@ public class Home {
     genderField.getItems().addAll("Nam", "Nữ", "Khác");
     prGenderField.getItems().addAll("Nam", "Nữ", "Khác");
 
-    teenagersList = FXCollections.observableArrayList(db.getTeenagers());
-    for (var x : teenagersList) {
-      if (x.getAge() <= 5) {
-        oneFive++;
-      } else {
-        if (x.getAge() <= 10) {
-          fiveTen++;
-        } else {
-          under18++;
-        }
+    
+    Task<Void> load = new Task<>() {
+      @Override
+      protected Void call() {
+        teenagersList = FXCollections.observableArrayList(db.getTeenagers());
+        Platform.runLater(() -> {
+            System.out.print("OK");
+            updateChart();
+        });
+        return null;
       }
-    }
-    updateChart();
+    };
+    new Thread(load).start();
     nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     genderColumn.setCellValueFactory(cellData -> cellData.getValue().genderProperty());
     birthdayColumn.setCellValueFactory(cellData -> cellData.getValue().birthdayProperty());
@@ -580,7 +603,7 @@ public class Home {
             if (teenager.getName() == null) {
               return false;
             }
-            return teenager.getName().toLowerCase().startsWith(lowerCaseFilter);
+            return teenager.getName().toLowerCase().contains(lowerCaseFilter);
           } else {
             if (teenager.getAddress1() == null || teenager.getAddress2() == null) {
               return false;
@@ -611,8 +634,8 @@ public class Home {
     Task<Void> task = new Task<>() {
       @Override
       protected Void call() {
-        // Create PieChart data
-        //TODO get data from database
+        reloadChart();
+                System.out.print("dcm123");
         PieChart pieChart = new PieChart();
         pieChart.getData().addAll(
             new Data("11 - 17", under18),
@@ -620,19 +643,7 @@ public class Home {
             new Data("6 - 10", fiveTen)
         );
         pieChart.setTitle("Phân bố độ tuổi thanh thiếu niên");
-
-        // Update the UI on the JavaFX Application Thread
-        Platform.runLater(() -> {
-          chart.getChildren().clear();
-          chart.getChildren().add(pieChart);
-        });
-        return null;
-      }
-    };
-    new Thread(task).start();
-    Task<Void> task1 = new Task<>() {
-      @Override
-      protected Void call() {
+        
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         
@@ -646,39 +657,38 @@ public class Home {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Số lượng thanh thiếu niên");
 
-        // This is sample data
-        //TODO get data from database
-        series.getData().add(new XYChart.Data<>("1", 1));
-        series.getData().add(new XYChart.Data<>("2", 2));
-        series.getData().add(new XYChart.Data<>("3", 3));
-        series.getData().add(new XYChart.Data<>("4", 4));
-        series.getData().add(new XYChart.Data<>("5", 5));
-        series.getData().add(new XYChart.Data<>("6", 6));
-        series.getData().add(new XYChart.Data<>("7", 7));
-        series.getData().add(new XYChart.Data<>("8", 8));
-        series.getData().add(new XYChart.Data<>("9", 9));
-        series.getData().add(new XYChart.Data<>("10", 10));
-        series.getData().add(new XYChart.Data<>("11", 50));
-        series.getData().add(new XYChart.Data<>("12", 50));
-        series.getData().add(new XYChart.Data<>("13", 60));
-        series.getData().add(new XYChart.Data<>("14", 80));
-        series.getData().add(new XYChart.Data<>("15", 90));
-        series.getData().add(new XYChart.Data<>("16", 100));
-        series.getData().add(new XYChart.Data<>("17", 110));
-        series.getData().add(new XYChart.Data<>("0", 120));
-
+        series.getData().add(new XYChart.Data<>("0", ageCount[0]));
+        series.getData().add(new XYChart.Data<>("1", ageCount[1]));
+        series.getData().add(new XYChart.Data<>("2", ageCount[2]));
+        series.getData().add(new XYChart.Data<>("3", ageCount[3]));
+        series.getData().add(new XYChart.Data<>("4", ageCount[4]));
+        series.getData().add(new XYChart.Data<>("5", ageCount[5]));
+        series.getData().add(new XYChart.Data<>("6", ageCount[6]));
+        series.getData().add(new XYChart.Data<>("7", ageCount[7]));
+        series.getData().add(new XYChart.Data<>("8", ageCount[8]));
+        series.getData().add(new XYChart.Data<>("9", ageCount[9]));
+        series.getData().add(new XYChart.Data<>("10", ageCount[10]));
+        series.getData().add(new XYChart.Data<>("11", ageCount[11]));
+        series.getData().add(new XYChart.Data<>("12", ageCount[12]));
+        series.getData().add(new XYChart.Data<>("13", ageCount[13]));
+        series.getData().add(new XYChart.Data<>("14", ageCount[14]));
+        series.getData().add(new XYChart.Data<>("15", ageCount[15]));
+        series.getData().add(new XYChart.Data<>("16", ageCount[16]));
+        series.getData().add(new XYChart.Data<>("17", ageCount[17]));
         barChart.getData().add(series);
 
 
-
-        // Update the UI on the JavaFX Application Thread
+        
         Platform.runLater(() -> {
+          chart.getChildren().clear();
+          chart.getChildren().add(pieChart);
           age.getChildren().add(barChart);
+          System.out.print("dcm456");
         });
         return null;
       }
     };
-    new Thread(task1).start();
+    new Thread(task).start();
   }
 
 
@@ -722,7 +732,7 @@ public class Home {
   }
 
   public void handleReloadClick() {
-      //TODO get data from database
+      teenagersList = FXCollections.observableArrayList(db.getTeenagers());
       teenagerTableView.refresh();
   }
   

@@ -13,6 +13,9 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
@@ -24,19 +27,60 @@ public class Login {
   private Parent root;
   
   @FXML
+  TextField userName;
+  @FXML
+  PasswordField password;
+  @FXML
   AnchorPane loginScene;
   @FXML
   ImageView loading;
-
+  PauseTransition pause = new PauseTransition(Duration.seconds(0));
+  Task<Void> task;
+  Alert wrongInfo = new Alert(Alert.AlertType.ERROR);
 
   @FXML
   public void handleLogin(Event event) throws IOException {
-    
-    Task<Void> loadingTask = new Task<Void>() {
+    if(userName.getText().equals("admin") && password.getText().equals("123456")) {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        loginScene.setVisible(false);
+        task = new Task<>() {
+          @Override
+          protected Void call() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("home.fxml"));
+            Platform.runLater(() -> {
+                try {
+                    HBox root = fxmlLoader.load();
+                    root.setPrefWidth(980);
+                    root.setPrefHeight(800);
+                    scene = new Scene(root, 980, 800);
+                } catch (IOException ex){
+                    ex.printStackTrace();
+                }
+                stage.setScene(scene);
+                stage.centerOnScreen();
+                stage.show();
+            });
+            return null;
+          }
+        };
+        pause.setOnFinished(ev -> {
+            new Thread(task).start();
+        });
+        pause.play();
+    } else {
+        wrongInfo.showAndWait();
+    }
+
+  }
+  
+  public void initialize(){
+      wrongInfo.setTitle("Lỗi");
+      wrongInfo.setHeaderText(null);
+      wrongInfo.setContentText("Tên đăng nhập hoặc mật khẩu không đúng !");
+      Task<Void> loadingTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                loginScene.setVisible(false);
-                RotateTransition rotateTransition = new RotateTransition(Duration.seconds(5), loading);
+                RotateTransition rotateTransition = new RotateTransition(Duration.seconds(2), loading);
                 rotateTransition.setByAngle(360);  
                 rotateTransition.setCycleCount(RotateTransition.INDEFINITE); 
                 rotateTransition.setInterpolator(javafx.animation.Interpolator.LINEAR);  
@@ -47,29 +91,7 @@ public class Login {
     };
     
     Thread loadingThread = new Thread(loadingTask);
-        loadingThread.setDaemon(true);  // Đảm bảo thread kết thúc khi ứng dụng đóng
+        loadingThread.setDaemon(true); 
         loadingThread.start();
-
-    Platform.runLater(() -> {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("home.fxml"));
-            HBox root = fxmlLoader.load();
-            root.setPrefWidth(980);
-            root.setPrefHeight(800);
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root, 980, 800);
-            stage.setScene(scene);
-            stage.setTitle("Teenager Management System");
-            stage.setResizable(false);
-            stage.centerOnScreen();
-            PauseTransition pause = new PauseTransition(Duration.seconds(3));
-            pause.setOnFinished(e -> {
-                stage.show();
-            });
-            pause.play();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    });
   }
 }
