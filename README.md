@@ -30,7 +30,7 @@ niên dưới 18 tuổi trong khu vực. Các thông tin một bản ghi bao g�
 
 ## Thông tin đăng nhập
 - Tài khoản: admin
-- Mật khẩu: admin
+- Mật khẩu: 123456
 
 ## Cài đặt
 - Tải phiên bản Release
