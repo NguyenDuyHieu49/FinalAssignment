@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.Cursor?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="3920.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.content.Home">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="3920.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.content.Home">
    <children>
       <AnchorPane fx:id="home" prefHeight="800.0" prefWidth="980.0" style="-fx-background-color: FBFCFC;">
          <children>
@@ -34,7 +36,75 @@
                   </Button>
                </children>
             </AnchorPane>
-            <StackPane fx:id="chart" layoutX="268.0" layoutY="335.0" prefHeight="333.0" prefWidth="444.0" />
+            <StackPane fx:id="chart" layoutX="500.0" layoutY="305.0" prefHeight="485.0" prefWidth="470.0" styleClass="customPane" stylesheets="@home.css">
+               <padding>
+                  <Insets bottom="20.0" />
+               </padding></StackPane>
+            <StackPane fx:id="age" layoutX="10.0" layoutY="305.0" prefHeight="485.0" prefWidth="470.0" styleClass="customPane" stylesheets="@home.css" />
+            <AnchorPane layoutX="490.0" layoutY="55.0" prefHeight="240.0" prefWidth="490.0">
+               <children>
+                  <AnchorPane layoutX="10.0" layoutY="10.0" prefHeight="220.0" prefWidth="470.0" style="-fx-border-color: black; -fx-border-radius: 5;">
+                     <children>
+                        <Text fx:id="day1" layoutX="14.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ngày" wrappingWidth="437.2210693359375">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <ImageView fx:id="weatherView" fitHeight="200.0" fitWidth="200.0" layoutX="264.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@clear-sky.png" />
+                           </image>
+                        </ImageView>
+                        <Text fx:id="maxT" layoutX="14.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nhiệt độ cao nhất : ">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="minT" layoutX="14.0" layoutY="186.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nhiệt độ thấp nhất : ">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="weatherType" layoutX="14.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Thời tiết :">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+            <AnchorPane layoutY="175.0" prefHeight="120.0" prefWidth="490.0">
+               <children>
+                  <AnchorPane layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="470.0" styleClass="customPane" stylesheets="@home.css">
+                     <children>
+                        <Text fx:id="time" fill="#73c3d9" layoutX="68.0" layoutY="79.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00 : 00 : 00">
+                           <font>
+                              <Font size="70.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+            <AnchorPane layoutY="55.0" prefHeight="120.0" prefWidth="490.0">
+               <children>
+                  <AnchorPane layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="470.0" styleClass="customPane" stylesheets="@home.css">
+                     <children>
+                        <Text layoutX="109.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HELLO, ">
+                           <font>
+                              <Font name="System Bold" size="35.0" />
+                           </font>
+                        </Text>
+                        <Text fill="#146bb3" layoutX="236.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="admin">
+                           <font>
+                              <Font name="System Bold Italic" size="35.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
          </children>
   
       </AnchorPane>
@@ -62,14 +132,14 @@
                   <TableColumn fx:id="CCCDColumn" editable="false" prefWidth="96.0" resizable="false" text="CCCD" />
                   <TableColumn fx:id="nameColumn" editable="false" prefWidth="140.6666259765625" resizable="false" text="TÊN" />
                   <TableColumn fx:id="genderColumn" editable="false" prefWidth="68.0" resizable="false" sortable="false" text="GIỚI TÍNH" />
-                  <TableColumn fx:id="birthdayColumn" editable="false" prefWidth="102.666748046875" resizable="false" text="NGÀY SINH" />
-                  <TableColumn editable="false" prefWidth="418.6666259765625" resizable="false" text="ĐỊA CHỈ">
+                  <TableColumn fx:id="birthdayColumn" editable="false" prefWidth="113.9998779296875" resizable="false" text="NGÀY SINH" />
+                  <TableColumn editable="false" prefWidth="391.3333740234375" resizable="false" text="ĐỊA CHỈ">
                      <columns>
                         <TableColumn fx:id="homeColumn" editable="false" prefWidth="200.0" resizable="false" text="NƠI Ở" />
                         <TableColumn fx:id="livingColumn" editable="false" prefWidth="200.0" resizable="false" text="HỘ KHẨU" />
                      </columns>
                   </TableColumn>
-                  <TableColumn fx:id="adjustColumn" editable="false" prefWidth="42.0" resizable="false" sortable="false" style="-fx-border-width: 1 1 2 1;" />
+                  <TableColumn fx:id="adjustColumn" editable="false" prefWidth="31.3333740234375" resizable="false" sortable="false" style="-fx-border-width: 1 1 2 1;" />
                </columns>
             </TableView>
             <TextField fx:id="searchBox" layoutX="739.0" layoutY="84.0" prefHeight="32.0" prefWidth="201.0" promptText="Tìm kiếm thanh thiếu niên" style="-fx-background-radius: 0;">
@@ -87,7 +157,7 @@
                   <Font name="System Bold" size="15.0" />
                </font>
                <graphic>
-                  <FontIcon iconSize="35" />
+                  <FontAwesomeIconView glyphName="USER_PLUS" size="35" />
                </graphic>
             </Button>
             <Button layoutX="267.0" layoutY="78.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="167.0" text="TẢI LẠI BẢNG" wrapText="true">
@@ -95,7 +165,7 @@
                   <Font name="System Bold" size="15.0" />
                </font>
                <graphic>
-                  <FontIcon iconSize="35" />
+                  <FontAwesomeIconView glyphName="REFRESH" size="35" />
                </graphic>
             </Button>
             <ComboBox fx:id="searchType" layoutX="655.0" layoutY="88.0" prefHeight="25.0" prefWidth="83.0" promptText="CCCD" style="-fx-background-color: FBFCFC;" />
@@ -125,7 +195,6 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Button>
-            <FontIcon iconSize="25" layoutX="63.0" layoutY="108.0" />
             <Text layoutX="106.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tên : ">
                <font>
                   <Font name="System Bold" size="15.0" />
@@ -231,6 +300,7 @@
                </font>
             </Text>
             <TextField fx:id="prFamilyStateField" layoutX="676.0" layoutY="462.0" prefHeight="25.0" prefWidth="195.0" promptText="Không tìm thấy tình trạng" />
+            <FontAwesomeIconView glyphName="CARET_LEFT" layoutX="69.0" layoutY="111.0" size="35" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="add" prefHeight="800.0" prefWidth="980.0" style="-fx-background-color: FBFCFC;">
@@ -256,7 +326,6 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Button>
-            <FontIcon iconSize="25" layoutX="63.0" layoutY="108.0" />
             <Text layoutX="106.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tên : ">
                <font>
                   <Font name="System Bold" size="15.0" />
@@ -381,6 +450,7 @@
                   </Button>
                </children>
             </AnchorPane>
+            <FontAwesomeIconView glyphName="CARET_LEFT" layoutX="69.0" layoutY="111.0" size="35" />
          </children>
       </AnchorPane>
    </children>

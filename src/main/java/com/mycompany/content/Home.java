@@ -1,6 +1,18 @@
 package com.mycompany.content;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -10,8 +22,12 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -21,13 +37,17 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
+import javafx.util.Pair;
 
 
 public class Home {
-
+   DatabaseManager db = DatabaseManager.getInstance();
   @FXML
   public StackPane chart;
   @FXML
@@ -122,6 +142,20 @@ public class Home {
   TextField cccdCheck;
   @FXML
   AnchorPane checkScene;
+  @FXML
+  StackPane age;
+  @FXML
+  Text day1;
+  @FXML
+  Text maxT;
+  @FXML
+  Text minT;
+  @FXML
+  ImageView weatherView;
+  @FXML
+  Text weatherType;
+  @FXML
+  Text time;
 
   boolean change = false;
 
@@ -155,6 +189,7 @@ public class Home {
   Alert checkAlert = new Alert(AlertType.ERROR);
 
   public void save() {
+     db.deleteTeen(currentTeenager.getCCCD());
     currentTeenager.setName(nameField.getText());
     currentTeenager.setGender(genderField.getValue());
     currentTeenager.setBirthday(birthdayField.getValue().toString());
@@ -167,8 +202,8 @@ public class Home {
     currentTeenager.setRelation(prRelationField.getText());
     currentTeenager.getPr().setAddress1(prHomeField.getText());
     currentTeenager.getPr().setAddress2(prLivingField.getText());
-    //TODO: Save data to JSON
-
+    //TODO: Save data to JSON - checked
+    db.addTeenager(currentTeenager);
     change = false;
   }
   Alert cccdFound = new Alert(AlertType.INFORMATION);
@@ -196,6 +231,7 @@ public class Home {
     other1 = add;
     other2 = adjust;
     handleData();
+    updateChart();
   }
 
   public void handleBackClick() {
@@ -226,8 +262,8 @@ public class Home {
     deleteAlert.showAndWait().ifPresent(r -> {
       if (r == deleteButton) {
         teenagersList.remove(currentTeenager);
-        //TODO Delete data from JSON
-
+        //TODO Delete data from JSON - checked
+        db.deleteTeen(currentTeenager.getCCCD());
         confirmDelete.showAndWait();
         back();
       }
@@ -321,6 +357,69 @@ public class Home {
   public ObservableList<teenager> teenagersList;
 
   public void initialize() {
+    DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH : mm : ss");
+    Timeline timeline = new Timeline(
+      new KeyFrame(Duration.seconds(1), event -> {
+        LocalDateTime current = LocalDateTime.now();
+        time.setText(current.format(formatTime));
+        })
+    );
+    timeline.setCycleCount(Timeline.INDEFINITE);
+    timeline.play();
+    HashMap<Integer, Pair<String,String>> weather = new HashMap<Integer, Pair<String,String>>();
+    weather.put(0, new Pair<>("Trời quang", "clear-sky.png"));
+    weather.put(1, new Pair<>("Nhiều mây", "cloud.png"));
+    weather.put(2, new Pair<>("Nhiều mây", "cloud.png"));
+    weather.put(3, new Pair<>("Nhiều mây", "cloud.png"));
+    weather.put(45, new Pair<>("Có sương mù", "fog.png"));
+    weather.put(48, new Pair<>("Có sương mù", "fog.png"));
+    weather.put(51, new Pair<>("Có mưa phùn", "drizzle.png"));
+    weather.put(53, new Pair<>("Có mưa phùn", "drizzle.png"));
+    weather.put(55, new Pair<>("Có mưa phùn", "drizzle.png"));
+    weather.put(56, new Pair<>("Có mưa phùn", "drizzle.png"));
+    weather.put(57, new Pair<>("Có mưa phùn", "drizzle.png"));
+    weather.put(61, new Pair<>("Có mưa", "rain.png"));
+    weather.put(63, new Pair<>("Có mưa", "rain.png"));
+    weather.put(65, new Pair<>("Có mưa", "rain.png"));
+    weather.put(66, new Pair<>("Có mưa đóng băng", "freezing-rain.png"));
+    weather.put(67, new Pair<>("Có mưa đóng băng", "freezing-rain.png"));
+    weather.put(71, new Pair<>("Có tuyết rơi", "snowy.png"));
+    weather.put(73, new Pair<>("Có tuyết rơi", "snowy.png"));
+    weather.put(75, new Pair<>("Có tuyết rơi", "snowy.png"));
+    weather.put(77, new Pair<>("Có tuyết rơi", "snowy.png"));
+    weather.put(80, new Pair<>("Mưa lớn", "shower.png"));
+    weather.put(81, new Pair<>("Mưa lớn", "shower.png"));
+    weather.put(82, new Pair<>("Mưa lớn", "shower.png"));
+    weather.put(85, new Pair<>("Mưa lớn", "shower.png"));
+    weather.put(86, new Pair<>("Mưa lớn", "shower.png"));
+    weather.put(95, new Pair<>("Mưa lớn có sấm sét", "thunderstorm.png"));
+    weather.put(96, new Pair<>("Mưa lớn có sấm sét", "thunderstorm.png"));
+    weather.put(99, new Pair<>("Mưa lớn có sấm sét", "thunderstorm.png"));
+    ObjectMapper objectMapper = new ObjectMapper();
+    File weatherFile = new File("weather_data.json");
+    try {
+        JsonNode rootNode = objectMapper.readTree(weatherFile);
+        JsonNode dailyNode = rootNode.path("daily");
+        JsonNode timeNode = dailyNode.path("time");
+        JsonNode weatherCodeNode = dailyNode.path("weather_code");
+        JsonNode maxTNode = dailyNode.path("temperature_2m_max");
+        JsonNode minTNode = dailyNode.path("temperature_2m_min");
+        LocalDate currentDate = LocalDate.parse(timeNode.get(0).asText());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Ngày' dd, 'tháng' MM, 'năm' yy");
+        day1.setText(currentDate.format(formatter));
+        maxT.setText("Nhiệt độ cao nhất : "+maxTNode.get(0).asText()+"°C");
+        minT.setText("Nhiệt độ thấp nhất : "+minTNode.get(0).asText()+"°C");
+        int t = weatherCodeNode.get(0).asInt();
+        if(weather.containsKey(t)) {
+            weatherType.setText("Thời tiết : "+weather.get(t).getKey());
+            Image image = new Image(getClass().getResource(weather.get(t).getValue()).toExternalForm());
+            weatherView.setImage(image);
+        }
+    }catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }    
     newGenderField.getItems().addAll("Nam", "Nữ", "Khác");
     newPrGenderField.getItems().addAll("Nam", "Nữ", "Khác");
     newPrcccdField.textProperty().addListener(new ChangeListener<String>() {
@@ -429,7 +528,7 @@ public class Home {
     genderField.getItems().addAll("Nam", "Nữ", "Khác");
     prGenderField.getItems().addAll("Nam", "Nữ", "Khác");
 
-    teenagersList = FXCollections.observableArrayList(DatabaseManager.getInstance().getTeenagers());
+    teenagersList = FXCollections.observableArrayList(db.getTeenagers());
     for (var x : teenagersList) {
       if (x.getAge() <= 5) {
         oneFive++;
@@ -452,10 +551,8 @@ public class Home {
         new ReadOnlyObjectWrapper<>(teenagerTableView.getItems().indexOf(cellData.getValue()) + 1));
     adjustColumn.setCellValueFactory(cellData -> {
       Button adjustButton = new Button();
-//      FontIcon icon = new FontIcon("mdi-account-settings-variant");
-      adjustButton.setStyle("-fx-cursor: hand");
-//      icon.setIconSize(14);
-//      adjustButton.setGraphic(icon);
+      FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.COG);
+      adjustButton.setGraphic(icon);
       adjustButton.setOnAction(event -> {
         change = false;
         currentTeenager = cellData.getValue();
@@ -515,13 +612,14 @@ public class Home {
       @Override
       protected Void call() {
         // Create PieChart data
+        //TODO get data from database
         PieChart pieChart = new PieChart();
         pieChart.getData().addAll(
-            new Data("10 - 17", under18),
+            new Data("11 - 17", under18),
             new Data("1 - 5", oneFive),
-            new Data("5 - 10", fiveTen)
+            new Data("6 - 10", fiveTen)
         );
-        pieChart.setTitle("Teenager Age Distribution");
+        pieChart.setTitle("Phân bố độ tuổi thanh thiếu niên");
 
         // Update the UI on the JavaFX Application Thread
         Platform.runLater(() -> {
@@ -532,6 +630,55 @@ public class Home {
       }
     };
     new Thread(task).start();
+    Task<Void> task1 = new Task<>() {
+      @Override
+      protected Void call() {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        
+        xAxis.setLabel("Độ tuổi");
+        yAxis.setLabel("Số lượng");
+
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        
+        barChart.setTitle("Độ tuổi của thanh thiếu niên");
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Số lượng thanh thiếu niên");
+
+        // This is sample data
+        //TODO get data from database
+        series.getData().add(new XYChart.Data<>("1", 1));
+        series.getData().add(new XYChart.Data<>("2", 2));
+        series.getData().add(new XYChart.Data<>("3", 3));
+        series.getData().add(new XYChart.Data<>("4", 4));
+        series.getData().add(new XYChart.Data<>("5", 5));
+        series.getData().add(new XYChart.Data<>("6", 6));
+        series.getData().add(new XYChart.Data<>("7", 7));
+        series.getData().add(new XYChart.Data<>("8", 8));
+        series.getData().add(new XYChart.Data<>("9", 9));
+        series.getData().add(new XYChart.Data<>("10", 10));
+        series.getData().add(new XYChart.Data<>("11", 50));
+        series.getData().add(new XYChart.Data<>("12", 50));
+        series.getData().add(new XYChart.Data<>("13", 60));
+        series.getData().add(new XYChart.Data<>("14", 80));
+        series.getData().add(new XYChart.Data<>("15", 90));
+        series.getData().add(new XYChart.Data<>("16", 100));
+        series.getData().add(new XYChart.Data<>("17", 110));
+        series.getData().add(new XYChart.Data<>("0", 120));
+
+        barChart.getData().add(series);
+
+
+
+        // Update the UI on the JavaFX Application Thread
+        Platform.runLater(() -> {
+          age.getChildren().add(barChart);
+        });
+        return null;
+      }
+    };
+    new Thread(task1).start();
   }
 
 
@@ -574,6 +721,11 @@ public class Home {
     }
   }
 
+  public void handleReloadClick() {
+      //TODO get data from database
+      teenagerTableView.refresh();
+  }
+  
   public void handleAdjustClick() {
     cur = adjust;
     other1 = data;
@@ -628,6 +780,7 @@ public class Home {
                       newPrHomeField.getText(), newPrLivingField.getText(),
                       newPrFamilyStateField.getText()), newPrRelationField.getText());
               teenagersList.add(currentTeenager);
+              db.addTeenager(currentTeenager);
               addStatus.showAndWait();
               back();
               editing = false;

@@ -38,3 +38,8 @@
 .table-view .table-cell:focused {
     -fx-background-color: #f1f8ff; /* Light blue background when a cell is focused */
 }
+
+.customPane {
+    -fx-border-radius : 5px;
+    -fx-border-color : black;   
+}
